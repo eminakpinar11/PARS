@@ -2,8 +2,7 @@ Copyright (c) 2026 Emin Akpinar
 
 All rights reserved.
 
-This repository contains the proprietary code for the PARS method:
-Performance-driven Adam-based Resilient Scaffold for Federated Learning.
+This repository contains the proprietary code for the PARS: Performance-driven Adam-based Resilient SCAFFOLD for Federated Learning.
 
 The code is provided solely for academic peer review purposes and is not open source.
 
