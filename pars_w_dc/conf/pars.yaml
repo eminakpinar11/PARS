@@ -1,0 +1,79 @@
+num_clients: 100
+num_epochs: 10
+batch_size: 64
+clients_per_round: 100
+learning_rate: 0.001
+num_rounds: 200
+partitioning: "iid"
+dataset_name: "mnist"
+dataset_seed: 42
+alpha: 0.5
+labels_per_client: 2
+
+# Adam optimizer parameters
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1e-8
+weight_decay: 0.00001
+
+# CV Confidence Configuration for PARS
+cv_confidence:
+  enabled: true             # Enable/disable CV confidence mechanism
+  alpha: 0.2               # Scaling factor for cosine similarity (0.0 = no effect)
+
+# Initial weights configuration
+initial_weights:
+  enabled: true
+  weights_dir: "saved_parameters"  # Directory containing the weight files
+  # Weight files are automatically selected based on dataset_name:
+  # mnist -> mnist_weights.pkl
+  # fmnist -> fmnist_weights.pkl  
+  # cifar10 -> cifar10_weights.pkl
+
+# Client function configuration
+client_fn:
+  _target_: client_pars.gen_client_fn_adam
+  _recursive_: False
+  num_epochs: ${num_epochs}
+  learning_rate: ${learning_rate}
+  betas: 
+    - ${adam_beta1}
+    - ${adam_beta2}
+  eps: ${adam_eps}
+  weight_decay: ${weight_decay}
+  cv_confidence_enabled: ${cv_confidence.enabled}
+  cv_alpha: ${cv_confidence.alpha}
+
+# Dataset configuration
+dataset:
+  name: ${dataset_name}
+  partitioning: ${partitioning}
+  batch_size: ${batch_size}
+  val_split: 0.0
+  seed: ${dataset_seed}
+  alpha: ${alpha}
+  labels_per_client: ${labels_per_client}
+
+# Model configuration
+model:
+  _target_: models.CNN
+  input_dim: 400
+  hidden_dims: [120, 84]
+  num_classes: 10
+
+# Strategy configuration
+strategy:
+  _target_: strategy.ParsStrategy
+  fraction_fit: 1.0
+  fraction_evaluate: 0.0
+  min_fit_clients: ${clients_per_round}
+  min_available_clients: ${clients_per_round}
+  min_evaluate_clients: 0
+
+# Server configuration
+server_device: cpu
+
+# Client resources
+client_resources:
+  num_cpus: 4
+  num_gpus: 0.0

@@ -1,0 +1,62 @@
+---
+num_clients: 100
+num_epochs: 10
+batch_size: 64
+clients_per_round: 100
+learning_rate: 0.01  # eta_l - client learning rate for FedAdam
+num_rounds: 200
+partitioning: "iid"
+dataset_name: "mnist"
+dataset_seed: 42
+alpha: 0.5
+labels_per_client: 2
+momentum: 0.9
+weight_decay: 0.00001
+
+initial_weights:
+  enabled: true
+  weights_dir: "saved_parameters"
+
+client_fn:
+  _target_: client_adaptive.gen_client_fn
+  _recursive_: False
+  num_epochs: ${num_epochs}
+  learning_rate: ${learning_rate}
+  momentum: ${momentum}
+  weight_decay: ${weight_decay}
+
+dataset:
+  name: ${dataset_name}
+  partitioning: ${partitioning}
+  batch_size: ${batch_size}
+  val_split: 0.0
+  seed: ${dataset_seed}
+  alpha: ${alpha}
+  labels_per_client: ${labels_per_client}
+
+model:
+  _target_: models_adaptive.CNN
+  input_dim: 400
+  hidden_dims: [120, 84]
+  num_classes: 10
+
+strategy:
+  _target_: flwr.server.strategy.FedAdam
+  fraction_fit: 1.0
+  fraction_evaluate: 0.0
+  min_fit_clients: ${clients_per_round}
+  min_available_clients: ${clients_per_round}
+  min_evaluate_clients: 0
+  eta: 0.003162          # server-side learning rate
+  eta_l: ${learning_rate}  # client-side learning rate
+  beta_1: 0.9        # momentum parameter
+  beta_2: 0.99       # second moment parameter
+  tau: 0.0001          # adaptability control
+
+client:
+
+server_device: cpu
+
+client_resources:
+  num_cpus: 4
+  num_gpus: 0.0
