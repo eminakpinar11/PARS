@@ -1,4 +1,4 @@
-# PARS: Performance-driven Adam-based Resilient Scaffold for Federated Learning
+# PARS: Performance-driven Adam-based Resilient SCAFFOLD for Federated Learning
 
 This repository contains the official implementation of **PARS**, a federated learning method proposed in the submitted manuscript:
 
